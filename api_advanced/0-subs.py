@@ -5,16 +5,25 @@ module that returns number of subscribers from Reddit API
 """
 
 import requests
+import sys
 
 
 def number_of_subscribers(subreddit):
-    api_url = 'https://www.reddit.com/r/{}/about.json'.format(subreddit)
+    """ Queries to Reddit API """
+    u_agent = 'Mozilla/5.0'
 
-    headers = requests.get.utils.default_headers()
-    headers.update({'user-Agent': 'My User Agent 1.0'})
+    headers = {
+        'User-Agent': u_agent
+    }
 
-    get_subs = requests.get(api_url, headers=headers).json()
-    subs = get_subs.get('data', {}).get('subscribers')
-    if not subs:
+    url = "https://www.reddit.com/r/{}/about.json".format(subreddit)
+    res = requests.get(url, headers=headers, allow_redirects=False)
+    if res.status_code != 200:
         return 0
-    return subs
+    dic = res.json()
+    if 'data' not in dic:
+        return 0
+    if 'subscribers' not in dic.get('data'):
+        return 0
+    return res.json()['data']['subscribers']
+    
